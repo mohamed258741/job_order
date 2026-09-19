@@ -26,6 +26,7 @@ import {
   formatEmailSubject,
 } from '../services/gmailService';
 import { StorageService } from '../services/storageService';
+import { AuthErrorBanner } from './AuthErrorBanner';
 
 interface GmailSendModalProps {
   order: MainOrder | null;
@@ -45,6 +46,7 @@ export const GmailSendModal: React.FC<GmailSendModalProps> = ({
   const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<any>(null);
 
   // Form states
   const [recipientChoice, setRecipientChoice] = useState<'central' | 'employee' | 'custom'>('central');
@@ -76,6 +78,7 @@ export const GmailSendModal: React.FC<GmailSendModalProps> = ({
         }
       }
       setErrorMessage(null);
+      setAuthError(null);
     }
   }, [isOpen, order]);
 
@@ -84,16 +87,23 @@ export const GmailSendModal: React.FC<GmailSendModalProps> = ({
     setCurrentUser(user);
     const token = await getAccessToken();
     setHasToken(!!token);
+    if (token) {
+      setAuthError(null);
+      setErrorMessage(null);
+    }
   };
 
   const handleSignIn = async () => {
     setIsAuthenticating(true);
     setErrorMessage(null);
+    setAuthError(null);
     try {
       const res = await googleSignIn();
       setCurrentUser(res.user);
       setHasToken(true);
+      setAuthError(null);
     } catch (err: any) {
+      setAuthError(err);
       setErrorMessage(err.message || 'Google authentication failed.');
     } finally {
       setIsAuthenticating(false);
@@ -258,8 +268,17 @@ export const GmailSendModal: React.FC<GmailSendModalProps> = ({
             )}
           </div>
 
-          {/* ERROR NOTIFICATION */}
-          {errorMessage && (
+          {/* AUTH ERROR / DOMAIN DIAGNOSTICS */}
+          {authError && (
+            <AuthErrorBanner
+              error={authError}
+              onRetry={handleSignIn}
+              onTokenSet={checkAuth}
+            />
+          )}
+
+          {/* GENERAL ERROR NOTIFICATION */}
+          {errorMessage && !authError && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-start gap-2 animate-in fade-in">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <div className="flex-1">

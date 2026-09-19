@@ -11,6 +11,7 @@ import {
   LogOut,
   Loader2,
   ExternalLink,
+  X,
 } from 'lucide-react';
 import { ActiveTab } from '../types';
 import { StorageService } from '../services/storageService';
@@ -21,6 +22,7 @@ import {
   getAccessToken,
   initAuth,
 } from '../services/googleAuthService';
+import { AuthErrorBanner } from './AuthErrorBanner';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -38,12 +40,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [user, setUser] = useState<any>(getCurrentUser());
   const [hasToken, setHasToken] = useState<boolean>(false);
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
+  const [authError, setAuthError] = useState<any>(null);
 
   useEffect(() => {
     const unsubscribe = initAuth(
       (authUser) => {
         setUser(authUser);
         setHasToken(true);
+        setAuthError(null);
       },
       () => {
         setUser(getCurrentUser());
@@ -60,16 +64,22 @@ export const Navbar: React.FC<NavbarProps> = ({
     const token = await getAccessToken();
     setHasToken(!!token);
     setUser(getCurrentUser());
+    if (token) {
+      setAuthError(null);
+    }
   };
 
   const handleConnectGmail = async () => {
     setIsSigningIn(true);
+    setAuthError(null);
     try {
       const res = await googleSignIn();
       setUser(res.user);
       setHasToken(true);
-    } catch (err) {
+      setAuthError(null);
+    } catch (err: any) {
       console.error('Gmail login failed', err);
+      setAuthError(err);
     } finally {
       setIsSigningIn(false);
     }
@@ -255,6 +265,33 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </div>
       </div>
+
+      {/* Auth Error Diagnostic Modal */}
+      {authError && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col animate-in fade-in">
+            <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Mail className="w-5 h-5 text-red-500" />
+                <h3 className="font-bold text-sm">Gmail Connection Diagnostics</h3>
+              </div>
+              <button
+                onClick={() => setAuthError(null)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5">
+              <AuthErrorBanner
+                error={authError}
+                onRetry={handleConnectGmail}
+                onTokenSet={checkToken}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

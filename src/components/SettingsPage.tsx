@@ -34,6 +34,7 @@ import {
   getAccessToken,
 } from '../services/googleAuthService';
 import { performFullCloudSync } from '../services/googleSheetsService';
+import { AuthErrorBanner } from './AuthErrorBanner';
 
 interface SettingsPageProps {
   settings: SystemSettings;
@@ -83,6 +84,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   const [googleUser, setGoogleUser] = useState<any>(getCurrentUser());
   const [hasGoogleToken, setHasGoogleToken] = useState<boolean>(false);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(false);
+  const [googleAuthError, setGoogleAuthError] = useState<any>(null);
 
   // Google Sheets & Drive Cloud Storage states
   const [googleSpreadsheetId, setGoogleSpreadsheetId] = useState(
@@ -146,19 +148,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     setGoogleUser(getCurrentUser());
     const token = await getAccessToken();
     setHasGoogleToken(!!token);
+    if (token) {
+      setGoogleAuthError(null);
+    }
   };
 
   const handleSignInGoogle = async () => {
     setIsAuthLoading(true);
+    setGoogleAuthError(null);
     try {
       const res = await googleSignIn();
       setGoogleUser(res.user);
       setHasGoogleToken(true);
+      setGoogleAuthError(null);
       setFeedback({
         type: 'success',
         text: `Connected to Gmail as ${res.user.email}. Ready to send job orders.`,
       });
     } catch (err: any) {
+      setGoogleAuthError(err);
       setFeedback({
         type: 'error',
         text: err.message || 'Failed to sign in with Google.',
@@ -538,6 +546,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             )}
           </div>
         </div>
+
+        {/* GOOGLE AUTH ERROR / DOMAIN DIAGNOSTICS */}
+        {googleAuthError && (
+          <AuthErrorBanner
+            error={googleAuthError}
+            onRetry={handleSignInGoogle}
+            onTokenSet={checkGoogleAuth}
+          />
+        )}
 
         {/* Dispatch Settings Form */}
         <form onSubmit={handleSaveGmailSettings} className="space-y-4 pt-2 text-xs">

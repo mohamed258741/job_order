@@ -28,6 +28,7 @@ import {
   getCurrentUser,
   googleSignIn,
 } from '../services/googleAuthService';
+import { AuthErrorBanner } from './AuthErrorBanner';
 
 interface CloudSyncModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
   const [isPullingFleet, setIsPullingFleet] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<any>(null);
   const [successInfo, setSuccessInfo] = useState<{
     orders: number;
     vehicles: number;
@@ -57,6 +59,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
   const handleSyncAll = async () => {
     setIsSyncing(true);
     setErrorMsg(null);
+    setAuthError(null);
     setSyncStatus('Connecting to Google Sheets & Drive API...');
 
     try {
@@ -84,6 +87,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
       if (onSyncComplete) onSyncComplete();
     } catch (err: any) {
       console.error('Cloud Sync Error:', err);
+      setAuthError(err);
       setErrorMsg(err.message || 'Failed to sync with Google Sheets.');
       setSyncStatus(null);
     } finally {
@@ -94,6 +98,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
   const handlePullFleetFromCloud = async () => {
     setIsPullingFleet(true);
     setErrorMsg(null);
+    setAuthError(null);
     setSyncStatus('Reading FMS fleet directly from Google Sheets...');
 
     try {
@@ -117,6 +122,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
       alert(`Successfully loaded ${vehicles.length} FMS vehicles from Google Sheets!`);
       if (onSyncComplete) onSyncComplete();
     } catch (err: any) {
+      setAuthError(err);
       setErrorMsg(err.message || 'Failed to load fleet from Google Sheets.');
       setSyncStatus(null);
     } finally {
@@ -236,7 +242,15 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
             </div>
           )}
 
-          {errorMsg && (
+          {authError && (
+            <AuthErrorBanner
+              error={authError}
+              onRetry={handleSyncAll}
+              onTokenSet={handleSyncAll}
+            />
+          )}
+
+          {errorMsg && !authError && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2 text-red-800 text-xs">
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
               <span>{errorMsg}</span>
