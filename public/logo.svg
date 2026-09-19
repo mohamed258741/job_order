@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 520" width="100%" height="100%">
+  <defs>
+    <style>
+      .brand-red { fill: #E1001A; }
+      .brand-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-weight: 700; font-size: 58px; letter-spacing: -2px; }
+    </style>
+  </defs>
+
+  <!-- e& Stylized Ribbon Graphic -->
+  <g class="brand-red">
+    <!-- Main Left 'e' circle with cut & bar -->
+    <path d="M 175,190 C 175,130 130,85 75,85 C 20,85 -25,130 -25,190 C -25,250 20,295 75,295 C 120,295 160,265 172,220 L 128,220 C 118,245 98,260 75,260 C 40,260 14,230 12,195 L 175,195 Z M 12,165 C 18,130 42,118 75,118 C 108,118 132,130 138,165 L 12,165 Z" transform="translate(100, 10)" />
+
+    <!-- Connecting fluid loop to '&' -->
+    <path d="M 330,80 C 290,80 260,110 260,150 C 260,175 272,198 290,215 L 220,285 C 210,295 200,302 188,308 C 170,316 150,320 130,320 C 95,320 65,310 40,292 L 62,265 C 80,278 105,286 130,286 C 145,286 160,283 172,277 C 180,273 188,268 195,260 L 265,190 C 245,170 232,145 232,115 C 232,55 275,15 330,15 C 385,15 430,58 430,115 C 430,165 395,215 345,265 L 435,355 L 395,395 L 305,305 C 275,335 240,355 200,365 L 210,332 C 242,322 272,305 298,280 L 322,256 C 362,215 392,170 392,120 C 392,80 365,48 330,48 C 295,48 268,78 268,118 C 268,140 278,160 292,175 L 320,147 C 312,138 306,128 306,118 C 306,105 315,95 330,95 C 345,95 355,105 355,118 C 355,135 342,152 328,166 L 312,182 L 332,202 C 362,172 388,138 388,105 C 388,68 360,40 330,40 Z" transform="translate(10, 0)" />
+  </g>
+
+  <!-- Wordmark: "etisalat and" -->
+  <text x="250" y="465" text-anchor="middle" class="brand-red brand-text">
+    etisalat and
+  </text>
+</svg>

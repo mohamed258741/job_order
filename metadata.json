@@ -1,0 +1,6 @@
+{
+  "name": "Fleet Maintenance Job Order Management System",
+  "description": "A simple V1 Fleet Maintenance Job Order system for creating maintenance requests, populating official Excel templates, generating PDFs, and tracking main orders.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
